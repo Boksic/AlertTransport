@@ -2,14 +2,16 @@ package com.nlrd.alerttransport;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
+
 
 /**
  * Created by BOKSIC on 01/10/2016.
  */
 
-public class SamplerPagerAdapter extends FragmentPagerAdapter
+public class SamplerPagerAdapter extends FragmentStatePagerAdapter
 {
+    private String []tabs = new String[]{"Carte", "Liste Alarme"};
     public SamplerPagerAdapter(FragmentManager fm)
     {
         super(fm);
@@ -34,5 +36,10 @@ public class SamplerPagerAdapter extends FragmentPagerAdapter
     public int getCount()
     {
         return 2;
+    }
+
+    @Override
+    public CharSequence getPageTitle(int position){
+        return tabs[position];
     }
 }
