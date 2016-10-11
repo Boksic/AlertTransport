@@ -22,13 +22,15 @@ public class SamplerPagerAdapter extends FragmentStatePagerAdapter
     {
         if (position == 0)
         {
-            return new AcceuilActivity();
+            AcceuilActivity acceuilActivity = new AcceuilActivity();
+
+            return acceuilActivity;
         }
         else if (position == 1)
         {
-            MapActivity mainActivity = new MapActivity();
+            MapActivity mapActivity = new MapActivity();
 
-            return (Fragment)mainActivity;
+            return mapActivity;
         }
         else
         {
