@@ -11,7 +11,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 public class SamplerPagerAdapter extends FragmentStatePagerAdapter
 {
-    private String []tabs = new String[]{"Carte", "Liste Alarme"};
+    private String []tabs = new String[]{"Acceuil", "Carte", "Liste Alarme"};
     public SamplerPagerAdapter(FragmentManager fm)
     {
         super(fm);
@@ -21,6 +21,10 @@ public class SamplerPagerAdapter extends FragmentStatePagerAdapter
     public Fragment getItem(int position)
     {
         if (position == 0)
+        {
+            return new AcceuilActivity();
+        }
+        else if (position == 1)
         {
             MapActivity mainActivity = new MapActivity();
 
@@ -35,7 +39,7 @@ public class SamplerPagerAdapter extends FragmentStatePagerAdapter
     @Override
     public int getCount()
     {
-        return 2;
+        return 3;
     }
 
     @Override
