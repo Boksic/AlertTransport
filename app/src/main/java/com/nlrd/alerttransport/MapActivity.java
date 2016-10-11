@@ -1,11 +1,14 @@
 package com.nlrd.alerttransport;
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +29,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.Console;
+import java.io.IOException;
+import java.util.List;
 
 public class MapActivity extends Fragment implements OnMapReadyCallback ,
         GoogleApiClient.ConnectionCallbacks,
@@ -37,6 +42,9 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private Marker marker;
+    private LatLng position;
+    MarkerOptions markerOptions;
+    Float zoom = new Float(17);
 
 
     @Override
@@ -92,12 +100,81 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
 
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
-        Float zoom = new Float(17);
+
         if (mLastLocation != null) {
             LatLng myPosition = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(myPosition).title("Ma position "));
+          //  mMap.addMarker(new MarkerOptions().position(myPosition).title("Ma position "));
             mMap.moveCamera(CameraUpdateFactory.zoomTo(zoom));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(myPosition));
+        }
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                position = latLng;
+                mMap.clear();
+                //markerOptions = new MarkerOptions();
+               // markerOptions.position(latLng);
+
+                mMap.moveCamera(CameraUpdateFactory.zoomTo(zoom));
+                marker = mMap.addMarker(new MarkerOptions().position(latLng));
+               // .snippet("Chaque marqueur devra contenir la descrition de la place du marqueur "));
+                marker.showInfoWindow();
+               // mMap.addMarker(markerOptions);
+
+                new ReverseGeocoding(getContext()).execute(latLng);
+
+
+            }
+        });
+        
+    }
+    private class  ReverseGeocoding extends AsyncTask <LatLng, Void, String>{
+
+        Context mContext;
+
+        public ReverseGeocoding (Context context){
+            super();
+            mContext = context;
+        }
+        @Override
+        protected String doInBackground(LatLng... params) {
+            Geocoder geocoder = new Geocoder((mContext));
+            double lat = params[0].latitude;
+            double longitude = params[0].longitude;
+            List<Address> adresses = null;
+            String adressText = "";
+
+            try{
+                adresses = geocoder.getFromLocation(lat,longitude,1);
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+
+            if(adresses != null && adresses.size() > 0 ){
+                Address address = adresses.get(0);
+
+                adressText = String.format("%s, %s, %s",
+                        address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
+                        address.getLocality(),
+                        address.getCountryName());
+            }
+
+            return adressText;
+        }
+        @Override
+        protected void onPostExecute(String addressText) {
+            // Setting the title for the marker.
+            // This will be displayed on taping the marker
+           mMap.clear();
+           // Toast.makeText(getContext(), addressText, Toast.LENGTH_SHORT).show();
+           // marker.setTitle(addressText);
+            mMap.moveCamera(CameraUpdateFactory.zoomTo(zoom));
+            marker = mMap.addMarker(new MarkerOptions().position(position).title(addressText));
+            marker.showInfoWindow();
+            // Placing a marker on the touched position
+           // mMap.addMarker(markerOptions);
+
         }
     }
 
