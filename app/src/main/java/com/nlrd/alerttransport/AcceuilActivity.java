@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
-import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,13 +29,16 @@ import com.google.android.gms.maps.model.LatLngBounds;
 
 public class AcceuilActivity extends Fragment implements
         GoogleApiClient.OnConnectionFailedListener,
-        GoogleApiClient.ConnectionCallbacks
+        GoogleApiClient.ConnectionCallbacks,
+        AdapterView.OnItemSelectedListener
 {
     private static final String LOG_TAG = "MainActivity";
     private static final int GOOGLE_API_CLIENT_ID = 0;
     private AutoCompleteTextView atvPlaces;
     private GoogleApiClient mGoogleApiClient;
     private PlaceArrayAdapter mPlaceArrayAdapter;
+    private static final String [] rayons = {"Rayon", "100", "200", "300", "400", "500", "600", "700", "800", "900", "1000"};
+    private int rayonPlace = 500;
     private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
             new LatLng(37.398160, -122.180831), new LatLng(37.430610, -121.972090));
 
@@ -59,8 +61,23 @@ public class AcceuilActivity extends Fragment implements
         atvPlaces.setAdapter(mPlaceArrayAdapter);
 
         Spinner spinner = (Spinner) rootView.findViewById(R.id.spinner);
-        ArrayAdapter<CharSequence> adapterSpinner = ArrayAdapter.createFromResource(getContext(), R.array.rayon,
-                android.R.layout.simple_spinner_dropdown_item);
+
+        spinner.setOnItemSelectedListener(this);
+
+        ArrayAdapter<String> adapterSpinner = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, rayons){
+            @Override public boolean isEnabled (int position)
+            {
+                if (position == 0)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        };
+
         spinner.setAdapter(adapterSpinner);
         return rootView;
     }
@@ -115,5 +132,27 @@ public class AcceuilActivity extends Fragment implements
                 "Google Places API connection failed with error code:" +
                         connectionResult.getErrorCode(),
                 Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+    {
+        if (position > 0)
+        {
+            Toast.makeText(getContext(), parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show();
+
+            try
+            {
+                rayonPlace = Integer.parseInt(parent.getItemAtPosition(position).toString());
+            } catch (NumberFormatException e) {
+                System.out.print(e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent)
+    {
+
     }
 }

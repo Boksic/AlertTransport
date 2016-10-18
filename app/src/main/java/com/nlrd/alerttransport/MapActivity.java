@@ -80,8 +80,6 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
         buildGoogleApiClient();
 
         mGoogleApiClient.connect();
-
-
     }
 
 
@@ -123,8 +121,6 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
                // mMap.addMarker(markerOptions);
 
                 new ReverseGeocoding(getContext()).execute(latLng);
-
-
             }
         });
         
