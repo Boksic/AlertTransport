@@ -77,7 +77,7 @@ public class AcceuilActivity extends Fragment implements
                 }
             }
         };
-
+        adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapterSpinner);
         return rootView;
     }
