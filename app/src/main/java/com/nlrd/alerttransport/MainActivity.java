@@ -1,5 +1,7 @@
 package com.nlrd.alerttransport;
 
+import android.app.Fragment;
+import android.location.Location;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +11,7 @@ import com.astuetz.PagerSlidingTabStrip;
 public class MainActivity extends AppCompatActivity
 {
     private ViewPager viewPagers;
+    public static MainActivity mainActivity = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -21,5 +24,7 @@ public class MainActivity extends AppCompatActivity
 
         PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
         tabs.setViewPager(viewPagers);
+
+        mainActivity = this;
     }
 }

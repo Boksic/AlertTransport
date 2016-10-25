@@ -28,7 +28,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.Console;
 import java.io.IOException;
 import java.util.List;
 
@@ -46,20 +45,32 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
     MarkerOptions markerOptions;
     Float zoom = new Float(17);
 
+    public static LatLng newLocation = new LatLng(0, 0);
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
-
         View rootView = inflater.inflate(R.layout.activity_map, container, false);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment supportMapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
         supportMapFragment.getMapAsync(this);
 
-
         return rootView;
     }
 
+    @Override
+    public void setMenuVisibility(boolean menuVisible)
+    {
+        super.setMenuVisibility(menuVisible);
+
+        if (menuVisible)
+        {
+            mMap.moveCamera(CameraUpdateFactory.zoomTo(zoom));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(newLocation));
+
+            marker = mMap.addMarker(new MarkerOptions().position(newLocation));
+        }
+    }
 
     /**
      * Manipulates the map once available.
@@ -83,8 +94,8 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
     }
 
 
-    protected synchronized void buildGoogleApiClient() {
-      //  Toast.makeText(this.getContext(), "buildGoogleApiClient", Toast.LENGTH_SHORT).show();
+    protected synchronized void buildGoogleApiClient()
+    {
         mGoogleApiClient = new GoogleApiClient.Builder(this.getContext())
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -100,10 +111,10 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
                 mGoogleApiClient);
 
         if (mLastLocation != null) {
-            LatLng myPosition = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-          //  mMap.addMarker(new MarkerOptions().position(myPosition).title("Ma position "));
+            newLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+
             mMap.moveCamera(CameraUpdateFactory.zoomTo(zoom));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(myPosition));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(newLocation));
         }
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {

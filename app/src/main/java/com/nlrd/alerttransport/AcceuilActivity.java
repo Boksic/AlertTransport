@@ -1,11 +1,13 @@
 package com.nlrd.alerttransport;
 
-
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -42,12 +45,14 @@ public class AcceuilActivity extends Fragment implements
     private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
             new LatLng(37.398160, -122.180831), new LatLng(37.430610, -121.972090));
 
+    private LatLng latlng;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
 
-        View rootView = inflater.inflate(R.layout.activity_acceuil, container, false);
+        final View rootView = inflater.inflate(R.layout.activity_acceuil, container, false);
         mGoogleApiClient = new GoogleApiClient.Builder(getContext())
                 .addApi(Places.GEO_DATA_API)
                 .enableAutoManage(getActivity(), GOOGLE_API_CLIENT_ID, this)
@@ -77,10 +82,28 @@ public class AcceuilActivity extends Fragment implements
                 }
             }
         };
+
         adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapterSpinner);
+
+        Button button = (Button) rootView.findViewById(R.id.DoneButton);
+
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                ViewPager viewPager = (ViewPager) MainActivity.mainActivity.findViewById(R.id.viewPager);
+
+                MapActivity.newLocation = latlng;
+
+                viewPager.setCurrentItem(1);
+            }
+        });
+
         return rootView;
     }
+
     private AdapterView.OnItemClickListener mAutocompleteClickListener
             = new AdapterView.OnItemClickListener() {
         @Override
@@ -108,6 +131,8 @@ public class AcceuilActivity extends Fragment implements
             final Place place = places.get(0);
             CharSequence attributions = places.getAttributions();
             Toast.makeText(getContext(), place.getName(), Toast.LENGTH_SHORT).show();
+
+            latlng = place.getLatLng();
 
         }
     };
@@ -154,5 +179,23 @@ public class AcceuilActivity extends Fragment implements
     public void onNothingSelected(AdapterView<?> parent)
     {
 
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+
+        mGoogleApiClient.stopAutoManage(getActivity());
+        mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+
+        mGoogleApiClient.stopAutoManage(getActivity());
+        mGoogleApiClient.disconnect();
     }
 }
