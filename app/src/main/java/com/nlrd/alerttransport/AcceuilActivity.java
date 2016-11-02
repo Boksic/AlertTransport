@@ -1,5 +1,7 @@
 package com.nlrd.alerttransport;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -28,6 +31,7 @@ import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+
 
 
 public class AcceuilActivity extends Fragment implements
@@ -87,17 +91,23 @@ public class AcceuilActivity extends Fragment implements
         spinner.setAdapter(adapterSpinner);
 
         Button button = (Button) rootView.findViewById(R.id.DoneButton);
-
+        button.setClickable(false);
+        button.setFocusable(false);
+        button.setBackgroundColor(Color.GRAY);
         button.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
+
                 ViewPager viewPager = (ViewPager) MainActivity.mainActivity.findViewById(R.id.viewPager);
 
                 MapActivity.newLocation = latlng;
-
+                MapActivity.rayon = rayonPlace;
+              //  MapActivity.infoDestination =
                 viewPager.setCurrentItem(1);
+                InputMethodManager input = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                input.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
             }
         });
 
@@ -131,7 +141,12 @@ public class AcceuilActivity extends Fragment implements
             final Place place = places.get(0);
             CharSequence attributions = places.getAttributions();
             Toast.makeText(getContext(), place.getName(), Toast.LENGTH_SHORT).show();
-
+            MapActivity.infoDestination = (String) place.getName();
+            Button button = (Button) getActivity().findViewById(R.id.DoneButton);
+            button.setClickable(true);
+            button.setFocusable(true);
+            button.setBackgroundColor(Color.rgb(58,83,155));
+            button.setTextColor(Color.WHITE);
             latlng = place.getLatLng();
 
         }
