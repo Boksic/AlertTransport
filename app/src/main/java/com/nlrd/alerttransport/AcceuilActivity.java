@@ -2,13 +2,11 @@ package com.nlrd.alerttransport;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -104,8 +102,10 @@ public class AcceuilActivity extends Fragment implements
 
                 MapActivity.newLocation = latlng;
                 MapActivity.rayon = rayonPlace;
-              //  MapActivity.infoDestination =
+
                 viewPager.setCurrentItem(1);
+
+                //Hide KeyBoard when button clicked
                 InputMethodManager input = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 input.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
             }
@@ -148,7 +148,6 @@ public class AcceuilActivity extends Fragment implements
             button.setBackgroundColor(Color.rgb(58,83,155));
             button.setTextColor(Color.WHITE);
             latlng = place.getLatLng();
-
         }
     };
     @Override
