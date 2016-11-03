@@ -55,11 +55,13 @@ public class AcceuilActivity extends Fragment implements
     {
 
         final View rootView = inflater.inflate(R.layout.activity_acceuil, container, false);
+
         mGoogleApiClient = new GoogleApiClient.Builder(getContext())
                 .addApi(Places.GEO_DATA_API)
                 .enableAutoManage(getActivity(), GOOGLE_API_CLIENT_ID, this)
                 .addConnectionCallbacks(this)
                 .build();
+
         atvPlaces = (AutoCompleteTextView) rootView.findViewById(R.id.atv_places);
         atvPlaces.setThreshold(3);
         atvPlaces.setOnItemClickListener(mAutocompleteClickListener);
@@ -71,7 +73,8 @@ public class AcceuilActivity extends Fragment implements
 
         spinner.setOnItemSelectedListener(this);
 
-        ArrayAdapter<String> adapterSpinner = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, rayons){
+        ArrayAdapter<String> adapterSpinner = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, rayons)
+        {
             @Override public boolean isEnabled (int position)
             {
                 if (position == 0)
@@ -128,42 +131,52 @@ public class AcceuilActivity extends Fragment implements
         }
     };
 
-    private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback
-            = new ResultCallback<PlaceBuffer>() {
+    private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback = new ResultCallback<PlaceBuffer>() {
         @Override
         public void onResult(PlaceBuffer places) {
-            if (!places.getStatus().isSuccess()) {
+            if (!places.getStatus().isSuccess())
+            {
                 Log.e(LOG_TAG, "Place query did not complete. Error: " +
                         places.getStatus().toString());
                 return;
             }
+
             // Selecting the first object buffer.
             final Place place = places.get(0);
+
             CharSequence attributions = places.getAttributions();
+
             Toast.makeText(getContext(), place.getName(), Toast.LENGTH_SHORT).show();
+
             MapActivity.infoDestination = (String) place.getName();
+
             Button button = (Button) getActivity().findViewById(R.id.DoneButton);
             button.setClickable(true);
             button.setFocusable(true);
             button.setBackgroundColor(Color.rgb(58,83,155));
             button.setTextColor(Color.WHITE);
+
             latlng = place.getLatLng();
         }
     };
+
     @Override
-    public void onConnected(@Nullable Bundle bundle) {
+    public void onConnected(@Nullable Bundle bundle)
+    {
         mPlaceArrayAdapter.setGoogleApiClient(mGoogleApiClient);
         Log.i(LOG_TAG, "Google Places API connected.");
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
+    public void onConnectionSuspended(int i)
+    {
         mPlaceArrayAdapter.setGoogleApiClient(null);
         Log.e(LOG_TAG, "Google Places API connection suspended.");
     }
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
+    {
         Log.e(LOG_TAG, "Google Places API connection failed with error code: "
                 + connectionResult.getErrorCode());
 

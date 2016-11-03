@@ -8,7 +8,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.AlarmClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -35,7 +34,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -175,31 +173,40 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
 
 
     @Override
-    public void onConnected(@Nullable Bundle bundle) {
-
+    public void onConnected(@Nullable Bundle bundle)
+    {
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
 
-        if (mLastLocation != null) {
+        if (mLastLocation != null)
+        {
             myLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+
             mMap.moveCamera(CameraUpdateFactory.zoomTo(zoom));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
+
             createLocationRequest();
             startLocationUpdates();
 
         }
 
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener()
+        {
             @Override
-            public void onMapClick(LatLng latLng) {
+            public void onMapClick(LatLng latLng)
+            {
                 position = latLng;
+
                 mMap.clear();
                 mMap.moveCamera(CameraUpdateFactory.zoomTo(zoom));
+
                 marker = mMap.addMarker(new MarkerOptions().position(latLng));
                 marker.showInfoWindow();
+
                 new ReverseGeocoding(getContext()).execute(latLng);
             }
         });
+
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(mLocationRequest);
         PendingResult<LocationSettingsResult> result;
@@ -207,21 +214,28 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
         result = LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient,
                 builder.build());
 
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>()
+        {
             @Override
-            public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
+            public void onResult(@NonNull LocationSettingsResult locationSettingsResult)
+            {
                 final Status status = locationSettingsResult.getStatus();
                 final LocationSettingsStates state = locationSettingsResult.getLocationSettingsStates();
-                switch (status.getStatusCode()) {
+                switch (status.getStatusCode())
+                {
                     case LocationSettingsStatusCodes.SUCCESS:
+
                         // All location settings are satisfied. The client can
                         // initialize location requests here.
                         Toast.makeText(getContext(),"Location changed",Toast.LENGTH_SHORT).show();
                         break;
+
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+
                         // Location settings are not satisfied, but this can be fixed
                         // by showing the user a dialog.
-                        try {
+                        try
+                        {
                             // Show the dialog by calling startResolutionForResult(),
                             // and check the result in onActivityResult().
                             status.startResolutionForResult(
@@ -230,7 +244,9 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
                             // Ignore the error.
                         }
                         break;
+
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+
                         // Location settings are not satisfied. However, we have no way
                         // to fix the settings so we won't show the dialog.
 
@@ -240,39 +256,49 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
         });
         
     }
-    private class  ReverseGeocoding extends AsyncTask <LatLng, Void, String>{
-
+    private class  ReverseGeocoding extends AsyncTask <LatLng, Void, String>
+    {
         Context mContext;
 
-        public ReverseGeocoding (Context context){
+        public ReverseGeocoding (Context context)
+        {
             super();
             mContext = context;
         }
+
         @Override
-        protected String doInBackground(LatLng... params) {
+        protected String doInBackground(LatLng... params)
+        {
             Geocoder geocoder = new Geocoder((mContext));
+
             double lat = params[0].latitude;
             double longitude = params[0].longitude;
+
             List<Address> adresses = null;
             String adressText = "";
 
-            try{
+            try
+            {
                 adresses = geocoder.getFromLocation(lat,longitude,1);
             } catch (IOException e){
                 e.printStackTrace();
             }
 
-            if(adresses != null && adresses.size() > 0 ){
+            if(adresses != null && adresses.size() > 0 )
+            {
                 Address address = adresses.get(0);
                 adressText = String.format("%s, %s, %s",
                         address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
                         address.getLocality(),
                         address.getCountryName());
             }
+
             return adressText;
         }
+
         @Override
-        protected void onPostExecute(String addressText) {
+        protected void onPostExecute(String addressText)
+        {
             mMap.clear();
             mMap.moveCamera(CameraUpdateFactory.zoomTo(zoom));
             marker = mMap.addMarker(new MarkerOptions().position(position).title(addressText));
@@ -281,87 +307,88 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
+    public void onConnectionSuspended(int i)
+    {
 
     }
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
+    {
         Toast.makeText(this.getContext(),"onConnectionFailed",Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(Location location)
+    {
         myLocation = new LatLng(location.getLatitude(),location.getLongitude());
-        //Toast.makeText(getContext(), DateFormat.getTimeInstance().format(new Date()).toString(),Toast.LENGTH_SHORT).show();
-       Location destination = new Location("destination");
+
+        Location destination = new Location("destination");
         destination.setLatitude(newLocation.latitude);
         destination.setLongitude(newLocation.longitude);
+
         float distance = location.distanceTo(destination);
-        if(distance <= rayon){
+
+        if(distance <= rayon)
+        {
             Toast.makeText(getContext(),"Arrivé",Toast.LENGTH_SHORT).show();
-            //AlarmClock(s);
         }
     }
 
     @Override
-    public void onPause(){
+    public void onPause()
+    {
         super.onPause();
         stopLocationUpdates();
     }
-    protected void createLocationRequest() {
+    protected void createLocationRequest()
+    {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-    protected void startLocationUpdates(){
+    protected void startLocationUpdates()
+    {
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 mGoogleApiClient, mLocationRequest, this);
     }
-    protected void stopLocationUpdates(){
+    protected void stopLocationUpdates()
+    {
         LocationServices.FusedLocationApi.removeLocationUpdates(
                 mGoogleApiClient, this);
     }
 
     private String getUrl(LatLng origin, LatLng dest)
     {
-        // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
 
-        // Destination of route
         String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
 
-        // Building the parameters to the web service
         String parameters = str_origin + "&" + str_dest;
 
-        // Output format
         String output = "json";
 
-        // Building the url to the web service
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&mode=transit";
 
         return url;
     }
 
-    /**
-     * A method to download json data from url
-     */
-    private String downloadUrl(String strUrl) throws IOException {
+    private String downloadUrl(String strUrl) throws IOException
+    {
         String data = "";
         InputStream iStream = null;
         HttpURLConnection urlConnection = null;
-        try {
+
+        try
+        {
             URL url = new URL(strUrl);
 
-            // Creating an http connection to communicate with url
             urlConnection = (HttpURLConnection) url.openConnection();
 
-            // Connecting to url
             urlConnection.connect();
 
-            // Reading data from url
             iStream = urlConnection.getInputStream();
 
             BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
@@ -369,7 +396,9 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
             StringBuffer sb = new StringBuffer();
 
             String line = "";
-            while ((line = br.readLine()) != null) {
+
+            while ((line = br.readLine()) != null)
+            {
                 sb.append(line);
             }
 
@@ -383,53 +412,51 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
             iStream.close();
             urlConnection.disconnect();
         }
+
         return data;
     }
 
     // Fetches data from url passed
-    private class FetchUrl extends AsyncTask<String, Void, String> {
-
+    private class FetchUrl extends AsyncTask<String, Void, String>
+    {
         @Override
-        protected String doInBackground(String... url) {
-
-            // For storing data from web service
+        protected String doInBackground(String... url)
+        {
             String data = "";
 
-            try {
-                // Fetching the data from web service
+            try
+            {
                 data = downloadUrl(url[0]);
                 Log.d("Background Task data", data.toString());
             } catch (Exception e) {
                 Log.d("Background Task", e.toString());
             }
+
             return data;
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(String result)
+        {
             super.onPostExecute(result);
 
             ParserTask parserTask = new ParserTask();
 
-            // Invokes the thread for parsing the JSON data
             parserTask.execute(result);
 
         }
     }
 
-    /**
-     * A class to parse the Google Places in JSON format
-     */
-    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
-
-        // Parsing the data in non-ui thread
+    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>>
+    {
         @Override
-        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
-
+        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData)
+        {
             JSONObject jObject;
             List<List<HashMap<String, String>>> routes = null;
 
-            try {
+            try
+            {
                 jObject = new JSONObject(jsonData[0]);
                 Log.d("ParserTask",jsonData[0].toString());
                 DatasParser parser = new DatasParser();
@@ -444,25 +471,25 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
                 Log.d("ParserTask",e.toString());
                 e.printStackTrace();
             }
+
             return routes;
         }
 
-        // Executes in UI thread, after the parsing process
         @Override
-        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+        protected void onPostExecute(List<List<HashMap<String, String>>> result)
+        {
             ArrayList<LatLng> points;
             PolylineOptions lineOptions = null;
 
-            // Traversing through all the routes
-            for (int i = 0; i < result.size(); i++) {
+            for (int i = 0; i < result.size(); i++)
+            {
                 points = new ArrayList<>();
                 lineOptions = new PolylineOptions();
 
-                // Fetching i-th route
                 List<HashMap<String, String>> path = result.get(i);
 
-                // Fetching all the points in i-th route
-                for (int j = 0; j < path.size(); j++) {
+                for (int j = 0; j < path.size(); j++)
+                {
                     HashMap<String, String> point = path.get(j);
 
                     double lat = Double.parseDouble(point.get("lat"));
@@ -472,7 +499,6 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
                     points.add(position);
                 }
 
-                // Adding all the points in the route to LineOptions
                 lineOptions.addAll(points);
                 lineOptions.width(10);
                 lineOptions.color(Color.RED);
@@ -481,11 +507,12 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
 
             }
 
-            // Drawing polyline in the Google Map for the i-th route
-            if(lineOptions != null) {
+            if(lineOptions != null)
+            {
                 mMap.addPolyline(lineOptions);
             }
-            else {
+            else
+            {
                 Log.d("onPostExecute","without Polylines drawn");
             }
         }

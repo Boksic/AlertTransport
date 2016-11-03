@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 public class SamplerPagerAdapter extends FragmentStatePagerAdapter
 {
     private String []tabs = new String[]{"Acceuil", "Carte", "Liste Alarme"};
+
     public SamplerPagerAdapter(FragmentManager fm)
     {
         super(fm);
@@ -45,7 +46,8 @@ public class SamplerPagerAdapter extends FragmentStatePagerAdapter
     }
 
     @Override
-    public CharSequence getPageTitle(int position){
+    public CharSequence getPageTitle(int position)
+    {
         return tabs[position];
     }
 }
