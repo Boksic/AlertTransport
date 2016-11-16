@@ -8,7 +8,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -114,11 +113,9 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
                 marker.showInfoWindow();
 
                 CircleOptions circleOptions = new CircleOptions().center(newLocation).radius(rayon).strokeWidth(5).strokeColor(Color.GREEN).fillColor(Color.argb(30,76,212,157));
-                Circle circle = mMap.addCircle(circleOptions);
+                mMap.addCircle(circleOptions);
 
                 mMap.animateCamera(cu);
-
-                //mMap.addPolyline(new PolylineOptions().add(myLocation, newLocation).width(10).color(Color.BLUE));
 
                 // Getting URL to the Google Directions API
                 String url = getUrl(myLocation, newLocation);
