@@ -63,6 +63,54 @@ public class DatasParser
         return routes;
     }
 
+    public List parseCorespondance(JSONObject jObject)
+    {
+        JSONArray jRoutes;
+        JSONArray jLegs;
+        JSONArray jSteps;
+        List path = new ArrayList<>();
+
+        try
+        {
+            jRoutes = jObject.getJSONArray("routes");
+
+            for(int i=0;i<jRoutes.length();i++)
+            {
+                jLegs = ( (JSONObject)jRoutes.get(i)).getJSONArray("legs");
+
+                for(int j=0;j<jLegs.length();j++)
+                {
+                    jSteps = ( (JSONObject)jLegs.get(j)).getJSONArray("steps");
+
+                    for(int k=1;k<jSteps.length();k++)
+                    {
+                        String travel_mode = (String) ((JSONObject) jSteps.get(k)).get("travel_mode");
+
+                        if (travel_mode.equalsIgnoreCase("TRANSIT"))
+                        {
+                            double lat = 0;
+                            double lng = 0;
+
+                            lat = (double) ((JSONObject) ((JSONObject) ((JSONObject) ((JSONObject) jSteps.get(k)).get("transit_details")).get("arrival_stop")).get("location")).get("lat");
+                            lng = (double) ((JSONObject) ((JSONObject) ((JSONObject) ((JSONObject) jSteps.get(k)).get("transit_details")).get("arrival_stop")).get("location")).get("lng");
+
+                            LatLng correspondanceLatLng = new LatLng(lat, lng);
+
+                            path.add(correspondanceLatLng);
+                        }
+                    }
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }catch (Exception e){
+            System.out.print("Error");
+        }
+
+        return path;
+    }
+
     private List<LatLng> decodePoly(String encoded)
     {
         List<LatLng> poly = new ArrayList<>();

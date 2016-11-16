@@ -8,6 +8,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -447,13 +448,14 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
         }
     }
 
-    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>>
+    private class ParserTask extends AsyncTask<String, Integer, List<Object>>
     {
         @Override
-        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData)
+        protected List<Object> doInBackground(String... jsonData)
         {
             JSONObject jObject;
             List<List<HashMap<String, String>>> routes = null;
+            List<List<HashMap<String, String>>> correspondance = null;
 
             try
             {
@@ -464,6 +466,8 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
 
                 // Starts parsing data
                 routes = parser.parse(jObject);
+                correspondance = parser.parseCorespondance(jObject);
+
                 Log.d("ParserTask","Executing routes");
                 Log.d("ParserTask",routes.toString());
 
@@ -472,21 +476,28 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
                 e.printStackTrace();
             }
 
-            return routes;
+            List<Object> result = new ArrayList<Object>();
+
+            result.add(routes);
+            result.add(correspondance);
+
+            return result;
         }
 
         @Override
-        protected void onPostExecute(List<List<HashMap<String, String>>> result)
+        protected void onPostExecute(List<Object> result)
         {
             ArrayList<LatLng> points;
             PolylineOptions lineOptions = null;
 
-            for (int i = 0; i < result.size(); i++)
+            List<List<HashMap<String, String>>> dataRoute = (List<List<HashMap<String, String>>>) result.get(0);
+
+            for (int i = 0; i < dataRoute.size(); i++)
             {
                 points = new ArrayList<>();
                 lineOptions = new PolylineOptions();
 
-                List<HashMap<String, String>> path = result.get(i);
+                List<HashMap<String, String>> path = dataRoute.get(i);
 
                 for (int j = 0; j < path.size(); j++)
                 {
@@ -504,7 +515,6 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
                 lineOptions.color(Color.RED);
 
                 Log.d("onPostExecute","onPostExecute lineoptions decoded");
-
             }
 
             if(lineOptions != null)
@@ -514,6 +524,16 @@ public class MapActivity extends Fragment implements OnMapReadyCallback ,
             else
             {
                 Log.d("onPostExecute","without Polylines drawn");
+            }
+
+            List dataCorrespondance = (List) result.get(1);
+
+            for (int i = 0 ; i < dataCorrespondance.size() ; i++)
+            {
+                marker = mMap.addMarker(new MarkerOptions().position((LatLng) dataCorrespondance.get(i)));
+
+                CircleOptions circleOptions = new CircleOptions().center((LatLng) dataCorrespondance.get(i)).radius(rayon).strokeWidth(5).fillColor(Color.argb(30, 76, 212, 157));
+                mMap.addCircle(circleOptions);
             }
         }
     }
